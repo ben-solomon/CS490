@@ -1,0 +1,48 @@
+@font-face {
+    font-family: orbitron;
+    src: url("orbitron-black.otf") format("opentype");
+}
+
+html {
+    font-family:orbitron;
+}
+#names > h3, h1 {
+
+    text-align:right;
+    color:#747707;
+    margin-right:5px;
+}
+
+.respond {
+    min-width:100vw;
+    border-bottom:1px solid #BCBBBB;
+}
+.respondx {
+    border-bottom:2px solid #BCBBBB;
+}
+.tall{
+    width:100vw;
+    height:40vh;
+    padding-top:5px;
+}
+
+.med {
+    width: calc(100% - 20px);
+    height: calc((100vw - 20px) * 0.5625);
+    padding:10px;
+
+}
+
+.h2 {
+    color:#BCBBBB;
+}
+
+.h3{
+    color:#747707;
+}
+
+@media only screen and (max-width: 768px) {
+    body {
+        font-size:10px;
+    }
+}
