@@ -1,0 +1,35 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+<div>
+
+        <div id="choose_container" style="width:600px;display:block;padding:50px;">
+          <div id="from_choose">
+            <p> Set your languages:</p>
+            <select [(ngModel)]="langFrom">
+              <option *ngFor="let language of languages" value= {{language.lang}}>
+                {{language.name}}
+              </option>
+            </select>
+            &nbsp;&nbsp;
+            <select [(ngModel)]="langTo" >
+              <option *ngFor="let language of languages" value= {{language.lang}}>
+                {{language.name}}
+              </option>
+            </select>
+          </div>
+
+
+
+        </div>
+        <div style="display:inline;width:600px;">
+              <h1> Text Translator</h1>
+              <input #txt type="text" placeholder="Enter phrase here..">
+              <p><button type="button" (click)="translate(txt.value)">Translate Text!!</button><br></p>
+                <i class="fa fa-search"></i>
+              </div>
+        </div>
+                 <span> Translation: <strong>{{translation}}</strong></span>
+  
+</div>
+
+<router-outlet></router-outlet>

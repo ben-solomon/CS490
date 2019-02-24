@@ -1,0 +1,23 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+    <h1>
+      Restaurant Finder
+    </h1>
+   <h2> Enter your city below</h2>
+  <br>
+  <input #CityName placeholder="Kansas City..">
+  <p><button (click)="searchRestaurants(CityName.value)">Search Restaurants </button></p>
+  <br>
+  <br>
+  <div class="container" style="overflow-y:scroll;display:flex;width:100%;flex-direction:row;flex-wrap:wrap;">
+      <div style="width:220px;margin-bottom:15px;" *ngFor="let restaurant of RestaurantList">
+        <img src={{restaurant.imageURL}} width="200" height="200">
+        <br>
+        <p><strong>{{restaurant.name}}</strong></p>
+        <p>{{restaurant.address}}</p>
+        <p>{{restaurant.area}}</p>
+        <br>
+        <a target="_blank" style="color:white;background:lightseagreen;height:30px;border-radius:15px;padding:5px;text-decoration:none;" href={{restaurant.bookURL}}>Make Reservation</a>
+    </div>
+  </div>
+<router-outlet></router-outlet>
