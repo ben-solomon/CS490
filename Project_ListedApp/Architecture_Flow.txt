@@ -1,0 +1,26 @@
+Below outlines the general steps for browsing the site ('behind the scenes'),
+which should help highlight the architecture design. 
+
+**In production, this would be running over HTTPS**
+
+1) User opens web browser and navigates to http://listed.ddns.net
+
+2) Firewall behind Server sees this request on port 80, and is 
+   forwarded to Server - IIS then handles the web request, and returns
+   client html, css and js files
+
+3) User is presented with Login page, and types in username and password.
+   This in turns triggers the first Ajax call - a POST request to check
+   if user and pass are valid in the Database. 
+
+4) If it is valid, a JSON Web Token is returned to the user and stored in the 
+   client's machine (cookie or browser storage). All subsequent API calls must 
+   include this token, else the user is redirected back to the login page.
+   This works similarly to API Keys in general.
+
+5) As the user naviagates the site, different Ajax calls will be made to bring 
+   the page to life (e.g as a user changes pinboards from the dropdown, all the respective 
+   lists on the pinboard automatically populate on the screen, without a page reload).
+   Ajax + the REST API allow the Website to act like a 'Webapp'
+
+

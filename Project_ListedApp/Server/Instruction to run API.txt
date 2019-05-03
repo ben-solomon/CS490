@@ -1,0 +1,20 @@
+Steps to run the API are as follows (dont include the ' ')
+But I dont suggest trying it :)
+
+- Open CMD and CD to the project directory
+- run 'npm install' to get node-modules dependencies downloaded
+- run 'node server' to run the API
+- it should now say API running on port 8080
+
+*CAUTION*
+This will only work locally, and with minimal functionality without 
+additional steps.
+
+- to access an Node.js API on the public internet, 
+you must use your router's/firewall's port forwarding abilities. 
+Node.js cant run on reserved system ports (<1024 like port 80 or 443 - http/https)
+
+- the API is set up with a SQL Express DB config that wont exist on your
+personal machines, any API calls that access the DB will fail. 
+
+ 

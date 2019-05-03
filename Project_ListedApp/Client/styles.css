@@ -1,0 +1,22 @@
+#loginerror{
+visibility:hidden;
+color:rgb(150, 0, 24);
+}
+.h1
+{
+font-weight:bold;
+}
+.container {
+	margin-top: 15%;
+	width: 50%;
+}
+
+.signin-button {
+	width: 15%;
+}
+
+.flex-col {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
