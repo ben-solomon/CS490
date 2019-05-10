@@ -202,3 +202,97 @@ app.post("/loadpinboard", function(req , res){
    var parameters = [{name: "PINBOARDID", sqltype: sql.VarChar, value: pinboardID}];
    executeQuery(res,query,parameters); 
 });
+
+app.post("/addList", function(req , res){
+   var pinBoardID = req.body.pinboardID;
+   var items = req.body.items;
+   var username = req.body.username;
+   var query = `insert into User_Lists 
+   ([ID],
+   [pinboardID]
+      ,[userID]
+      ,[creatorID]
+      ,[listTitle]
+      ,[isCheckable]
+      ,[isNumbered]
+      ,[isComplete]
+      ,[dueDate]
+      ,[createDate]) values ((SELECT MAX(ID)+1 from User_Lists Where userID=(SELECT ID FROM Logins Where username=@USERNAME)),@PINBOARDID,(SELECT ID FROM Logins Where username=@USERNAME),(SELECT ID FROM Logins Where username=@USERNAME),@TITLE,1,1,0,null,CURRENT_TIMESTAMP);`;
+   var parameters = [
+   {name: "PINBOARDID", sqltype: sql.VarChar, value: pinBoardID},
+   {name: "USERNAME", sqltype: sql.VarChar, value: username},
+   {name: "TITLE", sqltype: sql.VarChar, value: items[0]}];
+   for (j=1;j<items.length;j++){
+	   parameters.push({name: "ITEM"+j.toString(), sqltype: sql.VarChar, value: items[j]})
+	   query+="INSERT Into User_Lists_Items ( [ListID],[itemText],[isComplete]) values ((SELECT MAX(ID) from User_Lists where userID=(SELECT ID FROM Logins Where username=@USERNAME)),@ITEM"+ j.toString() +",0);"
+   }
+   var request = new sql.Request();
+   for (j=0;j<parameters.length;j++)
+   {
+    request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);                               
+   }
+   request.query(query);	
+   
+});
+
+app.post("/makeCheckable", function(req , res){
+   var listID = req.body.listID;
+  
+   var query = "UPDATE User_Lists set isCheckable=(SELECT ~isCheckable from User_Lists Where ID=@LISTID) where ID=@LISTID";
+   var parameters = [
+   {name: "LISTID", sqltype: sql.VarChar, value: listID}];
+   var request = new sql.Request();
+   for (j=0;j<parameters.length;j++)
+   {
+    request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);                               
+   }
+   request.query(query);	
+   
+});
+
+app.post("/makeEnumerable", function(req , res){
+   var listID = req.body.listID;
+  
+   var query = "UPDATE User_Lists set isCheckable=(SELECT ~isNumbered from User_Lists Where ID=@LISTID) where ID=@LISTID";
+   var parameters = [
+   {name: "LISTID", sqltype: sql.VarChar, value: listID}];
+   var request = new sql.Request();
+   for (j=0;j<parameters.length;j++)
+   {
+    request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);                               
+   }
+   request.query(query);	
+   
+});
+
+app.post("/deleteList", function(req , res){
+   var listID = req.body.listID;
+  
+   var query = "DELETE FROM User_Lists Where ID=@LISTID;Delete from User_Lists_Items where listID=@LISTID;";
+   var parameters = [
+   {name: "LISTID", sqltype: sql.VarChar, value: listID}];
+   var request = new sql.Request();
+   for (j=0;j<parameters.length;j++)
+   {
+    request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);                               
+   }
+   request.query(query);	
+   
+});
+
+app.post("/addPinboard", function(req , res){
+   var userID = req.body.userID;
+   var title = req.body.title;
+  
+   var query = "Insert into User_Pinboards values((SELECT ID from Logins where username=@USERID),@TITLE)";
+   var parameters = [
+   {name: "USERID", sqltype: sql.VarChar, value: userID},
+    {name: "TITLE", sqltype: sql.VarChar, value: title}];
+   var request = new sql.Request();
+   for (j=0;j<parameters.length;j++)
+   {
+    request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);                               
+   }
+   request.query(query);	
+   
+});
