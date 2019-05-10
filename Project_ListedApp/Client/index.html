@@ -3,33 +3,40 @@
 <head>
 
 <title>Page Title</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script type = "text/javascript" src = "https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <link rel="stylesheet" href="styles.css">
 <script src="login.js"></script>
-
+<meta charset="utf-8">
 </head>
 
 <body>
-  <div class="container">
+    <nav id="topnavwrapper">
+        <div class="nav-wrapper" id="topnav">
+          <a href="#" class="brand-logo lobster-font" id="headerlogo">Listed</a>
+        </div>
+      </nav>
+  <div class="container" style="width:30%">
     <h1 class="teal-text text-darken-2">Sign In</h1>
     <div class="row">
       <form class="col s12">
+        <div class="row">
+          <div class="input-field col s12">
+            <input id="email" type="email" class="validate">
+            <label for="email">E-mail</label>
+          </div>
+        </div>
         <div class="row">
           <div class="input-field col s12">
             <input id="password" type="password" class="validate">
             <label for="password">Password</label>
           </div>
         </div>
-        <div class="row">
-          <div class="input-field col s12">
-            <input id="email" type="email" class="validate">
-            <label for="email">Email</label>
-          </div>
-        </div>
-		<p id="loginerror" > Username or Password incorrect!</p>
-        <a id="loginbutton" onclick="login()"class="waves-effect waves-light btn signin-button">Login</a>
+        <a style="width:90px"class="waves-effect waves-light btn signin-button" onclick="login()">Login</a>
       </form>
     </div>
   </div>

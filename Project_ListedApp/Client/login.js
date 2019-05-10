@@ -1,5 +1,9 @@
+
+
 function login() {
-    var user = {"user":"bsbs93@gmail.com","pass":"password"};
+   var username = $("#email").val();
+   var password = $('#password').val();
+    var user = {"user":username,"pass":password};
 
     $.ajax({
         type: "POST",
@@ -8,12 +12,18 @@ function login() {
         data: JSON.stringify(user),
         cache: false,
         success: function(data){
-           alert("login good!");
-        },
+           setAuth(data["token"],username);
+           window.location.href = '/template.html'
+         }
+            ,
         error: function(data){
            document.getElementById('loginerror').style.visibility = 'visible';
         }
       });
 }
 
-// currently Username and Pass are hard coded for testing, will eventually pull from the text fields.
+function setAuth(txt,usr)
+{
+   localStorage.setItem("token",txt);
+   localStorage.setItem("username",usr);
+}
