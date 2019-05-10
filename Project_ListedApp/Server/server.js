@@ -61,7 +61,7 @@ var dbConfig = {
 sql.connect(dbConfig, function(err){if(err){console.log(err);}});
 
 //Function to connect to database and execute query
-var  executeQuery = function(res, query, parameters, type){             
+var  executeQuery = function(res, query, parameters){             
      const poolx = new sql.ConnectionPool(dbConfig, function (err) {
          if (err) {   
                      console.log("Error while connecting database :- " + err);
@@ -74,7 +74,7 @@ var  executeQuery = function(res, query, parameters, type){
                          if (parameters.length < 1){
                             request.query(query, function (err, resp) {
                                 if (err) {
-                                           console.log("Error while querying database READ:- " + err);
+                                           console.log("Error while querying database");
                                            //res.send(err);
                                          
                                           }
@@ -87,21 +87,19 @@ var  executeQuery = function(res, query, parameters, type){
                          }
                          else{
                              for (j=0;j<parameters.length;j++){
-                                 request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);
-                                
+                                 request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);   
                              }
-                             request.query(query, function (err, resp){
-								 if (!err){
-									 if (type == 1) // login
-								 {
-									 
-								 }
-								 else if (type == 0) {
-									 res.send(resp);
-								 }
-								 }
-								 
-							 });
+                                request.query(query, function (err, resp) {
+                                if (err) {
+                                           console.log("Error while querying database");
+
+                                          }
+                                          else {
+                                            res.json(resp);
+                                           
+                                                 }
+                                    });
+								
                              
                          }
                        }
@@ -153,7 +151,6 @@ app.post("/login", function(req , res){
 });
 
 
-
 app.use(function(req,res,next){
 var tokenx = req.body.token || req.query.token || req.headers['x-access-token'];
 if (tokenx){
@@ -170,4 +167,38 @@ if (tokenx){
 }else {
     return res.status(403).send({success: false, message: ' no token'});
 }
+});
+
+app.post("/verify", function(req , res){
+   var tokenx = req.body.token
+  if (tokenx){
+    jwt.verify(tokenx, app.get('superSecret'),function(err, decoded) {
+        if (err){
+            res.sendStatus(500);
+			return;
+
+        }else{
+            res.sendStatus(200);
+			return;
+        }
+    })
+}else {
+    res.sendStatus(500);
+	return;
+
+}
+});
+
+app.post("/loadpinboardlist", function(req , res){
+   var userID = req.body.userID;
+   var query = "select ID,pinboardName from [ListedApp].[dbo].[User_Pinboards] where userID=(SELECT ID from Logins Where username=@USERNAME)";
+   var parameters = [{name: "USERNAME", sqltype: sql.VarChar, value: userID}];
+   executeQuery(res,query,parameters); 
+});
+
+app.post("/loadpinboard", function(req , res){
+   var pinboardID = req.body.pinboardID;
+   var query = "select * from [ListedApp].[dbo].[ListPlusItems] where pinboardID=@PINBOARDID";
+   var parameters = [{name: "PINBOARDID", sqltype: sql.VarChar, value: pinboardID}];
+   executeQuery(res,query,parameters); 
 });
