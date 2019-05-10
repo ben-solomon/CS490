@@ -15,6 +15,10 @@ $(document).ready(function(){
 
       //////////
       loadPinboardsList();
+      $('#mainarea').innerHTML = "";
+      loadPinboard();
+      document.getElementById('mainarea').style.display = 'none';
+      document.getElementById('mainarea').style.display = 'flex';
 })
 function bestCopyEver(src) {
     return Object.assign({}, src);
@@ -82,7 +86,7 @@ function loadPinboardsList(){
                 for (var i=0;i<objArray.length;i++)
                 {
                     if(i==0){
-                        str +=  "<option value='"+ objArray[i]["ID"] +"' selected='selected'>"+ objArray[i]["pinboardName"] +"</option>";
+                        str +=  "<option value='"+ objArray[i]["ID"] +"' selected>"+ objArray[i]["pinboardName"] +"</option>";
                     }else{
                         str +=  "<option value='"+ objArray[i]["ID"] +"'>"+ objArray[i]["pinboardName"] +"</option>";
                     }
@@ -113,7 +117,7 @@ function loadPinboard(){
         cache: false,
         success: function(data){
             ///////////////////////////////////
-          var htmlstring = "";
+          var htmlstring = `<p id="addListBtn" data-PinID="0" onclick='toggleAddList()' class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Add List</p>`;
           var lastlistID = 0;
           var isNumbered = false;
           for(var i=0;i<data["recordset"].length;i++)
@@ -181,21 +185,33 @@ function loadPinboard(){
                 }
             }
             lastlistID = listrow["ListID"];
-            if(listrow["isComplete"]){
-                htmlstring += `<li>
-                <div style="display:flex;flex-direction: row;flex-wrap:nowrap; justify-content:space-between;">
-                  <label style="width:190px;color:black;font-size:13px;word-wrap:break-word;">`+ listrow["itemText"]+`</label>
-                  <label style="margin-right:20px;" class="chkbox"><input onchange="completeItem(this.getAttribute('data-listItemID'))" style="opacity:100;z-index:100" type="checkbox" name="listitem" data-listItemID="`+ listrow["listItemID"]+`" checked></label>
-                </div>
-              </li>`;
-            }else{
-                htmlstring += `<li>
-                <div style="display:flex;flex-direction: row;flex-wrap:nowrap; justify-content:space-between;">
-                  <label style="width:190px;color:black;font-size:13px;word-wrap:break-word;">`+ listrow["itemText"]+`</label>
-                  <label style="margin-right:20px;" class="chkbox"><input onchange="completeItem(this.getAttribute('data-listItemID'))" style="opacity:100;z-index:100" type="checkbox" name="listitem" data-listItemID="`+ listrow["listItemID"]+`"></label>
-                </div>
-              </li>`;
+            if(listrow["isCheckable"]){
+                if(listrow["isComplete"]){
+                    htmlstring += `<li>
+                    <div style="display:flex;flex-direction: row;flex-wrap:nowrap; justify-content:space-between;">
+                      <label style="width:190px;color:black;font-size:13px;word-wrap:break-word;">`+ listrow["itemText"]+`</label>
+                      <label style="margin-right:20px;" class="chkbox"><input onchange="completeItem(this.getAttribute('data-listItemID'))" style="opacity:100;z-index:100" type="checkbox" name="listitem" data-listItemID="`+ listrow["listItemID"]+`" checked></label>
+                    </div>
+                  </li>`;
+                }else{
+                    htmlstring += `<li>
+                    <div style="display:flex;flex-direction: row;flex-wrap:nowrap; justify-content:space-between;">
+                      <label style="width:190px;color:black;font-size:13px;word-wrap:break-word;">`+ listrow["itemText"]+`</label>
+                      <label style="margin-right:20px;" class="chkbox"><input onchange="completeItem(this.getAttribute('data-listItemID'))" style="opacity:100;z-index:100" type="checkbox" name="listitem" data-listItemID="`+ listrow["listItemID"]+`"></label>
+                    </div>
+                  </li>`;
+                }
             }
+            else{
+                
+                    htmlstring += `<li>
+                    <div style="display:flex;flex-direction: row;flex-wrap:nowrap; justify-content:space-between;">
+                      <label style="width:190px;color:black;font-size:13px;word-wrap:break-word;">`+ listrow["itemText"]+`</label>
+                   </div>
+                  </li>`;
+               
+            }
+            
           }
           if(isNumbered){
             htmlstring += "</ol>";
@@ -233,15 +249,89 @@ function toggleOptionsMenu(listID){
     }
 }
 
+function toggleAddList(){
+    var htmlstring =  `<div class="boxx">
+    <label onclick="loadPinboard()" style="margin-left:-260px;font-size:16px;color:red;">X</label>
+    <h3 class="teal-text text-darken-2">Create new list</h3>
+    <form id="createListForm" class="flex-column">
+          <input  type="text" class="validate" placeholder="List Title">
+          <input  type="text" class="validate" placeholder="List Item">
+    </form>
+    <button onclick="addRowListCreate()" class="add-icon" ><i class="material-icons">add_circle_outline</i></button>
+    <p onclick='addList()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Create</p>
+ </div>`;
+ document.getElementById('mainarea').innerHTML = htmlstring;
+ document.getElementById('pinboardadd').style.display = 'none';
+ hidePinboardMenu();
+ }
+
+ function addList(){
+    var currentPinboard = $('#pinboardselect').find(":selected").val();
+    var listItems = document.getElementById('createListForm').children;
+    var ListArray = [];
+    for (i=0;i<listItems.length;i++){
+        ListArray.push(listItems[i].value);
+    }
+    var obj = {"pinboardID":currentPinboard,"items":ListArray,"username":getUsername()};
+        $.ajax({
+        type: "POST",
+        contentType:'application/json',
+        beforeSend: function(request) {
+            request.setRequestHeader("x-access-token", getJWT());
+          },
+        url: "http://listed.ddns.net:8080/addList",
+        data: JSON.stringify(obj),
+        cache: false,
+        success: function(data){
+           
+         },
+        error: function(data){
+          alert("failed");
+        }
+      });
+      $('#mainarea').innerHTML = "";
+      loadPinboard();
+      document.getElementById('mainarea').style.display = 'none';
+      document.getElementById('mainarea').style.display = 'flex';
+
+ }
+
+ function addPinboard() {
+     var currentUser = getUsername();
+     var listItems = document.getElementById('createListForm').children;
+     var ListArray = [];
+     for (i=0;i<listItems.length;i++){
+         ListArray.push(listItems[i].value);
+     }
+     var obj = {"userID":currentUser,"title":ListArray[0]};
+        $.ajax({
+        type: "POST",
+        contentType:'application/json',
+        beforeSend: function(request) {
+            request.setRequestHeader("x-access-token", getJWT());
+          },
+        url: "http://listed.ddns.net:8080/addPinboard",
+        data: JSON.stringify(obj),
+        cache: false,
+        success: function(data){
+           
+         },
+        error: function(data){
+          alert("failed");
+        }
+      });
+      $('#mainarea').innerHTML = "";
+      loadPinboard();
+      document.getElementById('mainarea').style.display = 'none';
+        document.getElementById('mainarea').style.display = 'flex';
+ }
 function toggleAddPin(){
-   var htmlstring =  `<div class="box">
+   var htmlstring =  `<div class="boxx">
    <label onclick="loadPinboard()" style="margin-left:-260px;font-size:16px;color:red;">X</label>
    <h3 class="teal-text text-darken-2">Create new list</h3>
    <form id="createListForm" class="flex-column">
-         <input  type="text" class="validate" placeholder="List Title">
-         <input  type="text" class="validate" placeholder="List Item">
+         <input  type="text" class="validate" placeholder="Pinboard Title">
    </form>
-   <button onclick="addRowListCreate()" class="add-icon" ><i class="material-icons">add_circle_outline</i></button>
    <p onclick='loadPinboard()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Create</p>
 </div>`;
 document.getElementById('mainarea').innerHTML = htmlstring;
@@ -250,6 +340,80 @@ hidePinboardMenu();
 }
 
 function addRowListCreate(){
-    var str = `<input  type="text" class="validate" placeholder="List Item">`;
-    document.getElementById('createListForm').innerHTML += str
+    var newInput = document.createElement('input');
+    newInput.innerHTML = `<input  type="text" class="validate" placeholder="List Item">`;
+    document.getElementById('createListForm').appendChild(newInput);
+}
+
+function makeCheckable(listID){
+
+    $.ajax({
+        type: "POST",
+        contentType:'application/json',
+        beforeSend: function(request) {
+            request.setRequestHeader("x-access-token", getJWT());
+          },
+        url: "http://listed.ddns.net:8080/makeCheckable",
+        data: JSON.stringify({"listID":listID}),
+        cache: false,
+        success: function(data){
+
+      
+         },
+        error: function(data){
+          alert("failed");
+        }
+      });
+  $('#mainarea').innerHTML = "";
+  loadPinboard();
+  document.getElementById('mainarea').style.display = 'none';
+  document.getElementById('mainarea').style.display = 'flex';
+}
+
+function makeEnumerable(listID){
+    $.ajax({
+        type: "POST",
+        contentType:'application/json',
+        beforeSend: function(request) {
+            request.setRequestHeader("x-access-token", getJWT());
+          },
+        url: "http://listed.ddns.net:8080/makeEnumerable",
+        data: JSON.stringify({"listID":listID}),
+        cache: false,
+        success: function(data){
+
+      
+         },
+        error: function(data){
+          alert("failed");
+        }
+      });
+  $('#mainarea').innerHTML = "";
+  loadPinboard();
+  document.getElementById('mainarea').style.display = 'none';
+  document.getElementById('mainarea').style.display = 'flex';
+}
+
+function deleteList(listID){
+    $.ajax({
+        type: "POST",
+        contentType:'application/json',
+        beforeSend: function(request) {
+            request.setRequestHeader("x-access-token", getJWT());
+          },
+        url: "http://listed.ddns.net:8080/deleteList",
+        data: JSON.stringify({"listID":listID}),
+        cache: false,
+        success: function(data){
+
+      
+         },
+        error: function(data){
+          alert("failed");
+        }
+      });
+  $('#mainarea').innerHTML = "";
+  loadPinboard();
+  document.getElementById('mainarea').style.display = 'none';
+  document.getElementById('mainarea').style.display = 'flex';
 }

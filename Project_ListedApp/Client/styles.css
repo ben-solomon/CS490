@@ -10,7 +10,8 @@ body{
 }
 
 #mainarea{
-padding:25px;
+padding:15px;
+width:100vw;
 display:flex;
 	flex-direction:row;
 	flex-wrap: wrap;
@@ -257,7 +258,7 @@ color:lightblue;
 }
 
 
-#box{
+#boxx{
 	margin-left:40vw;
 	margin-top:100px;
 	overflow-y:scroll;
@@ -265,4 +266,9 @@ color:lightblue;
 
 .button:hover{
 	cursor:pointer;
+}
+
+#addListBtn{
+	width:60px;
+	height:60px;
 }
