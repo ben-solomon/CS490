@@ -10,11 +10,12 @@ body{
 }
 
 #mainarea{
-padding:15px;
+padding:40px;
 width:100vw;
 display:flex;
 	flex-direction:row;
 	flex-wrap: wrap;
+	overflow-y:scroll;
 }
 .signin-button {
 	width: 15%;
@@ -39,7 +40,14 @@ nav form {
     width: 40%;
 		margin: auto;
 }
-
+::-webkit-scrollbar {
+    width: 0px;  /* Remove scrollbar space */
+    background: transparent;  /* Optional: just make scrollbar invisible */
+}
+/* Optional: show position indicator in red */
+::-webkit-scrollbar-thumb {
+    background: #FF0000;
+}
 nav ul a {
 	margin-right: 30px;
 }
@@ -258,7 +266,10 @@ color:lightblue;
 }
 
 
-#boxx{
+.boxx{
+	height:500;
+	width:300;
+	padding-right:20px;
 	margin-left:40vw;
 	margin-top:100px;
 	overflow-y:scroll;
@@ -269,6 +280,7 @@ color:lightblue;
 }
 
 #addListBtn{
-	width:60px;
+	width:90px;
+	padding:5px;
 	height:60px;
 }

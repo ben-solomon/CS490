@@ -35,11 +35,10 @@
 <div id="pinboardtab" onclick="togglePinboardMenu()">
     ▼
 </div>
-<div id="mainarea"  onclick="hidePinboardMenu()">
-    <p id="addListBtn" data-PinID="0" onclick='toggleAddList()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Add List</p>`
-  
-</div>
+<div onload="loadPinboardsList()" id="mainarea">
 
+    <p id="addListBtn" data-PinID="0" onclick='toggleAddList()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Add List</p>
+<script>loadPinboard()</script>
   </div>
 </body>
 <footer>

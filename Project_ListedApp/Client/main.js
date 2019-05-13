@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    // checks if user is logged in properly, else redirects to login page
     $.ajax({
         type: "POST",
         contentType:'application/json',
@@ -6,28 +7,29 @@ $(document).ready(function(){
         data: JSON.stringify({"token": getJWT()}),
         cache: false,
         success: function(data){
-           //alert("Welcome " + getUsername() + "!");
+            loadPinboardsList();
         },
         error: function(data){
             window.location.href = '/index.html'
         }
+        ,complete:function(){
+            
+        }
       });
-
-      //////////
-      loadPinboardsList();
-      $('#mainarea').innerHTML = "";
-      loadPinboard();
-      document.getElementById('mainarea').style.display = 'none';
-      document.getElementById('mainarea').style.display = 'flex';
+      
 })
-function bestCopyEver(src) {
-    return Object.assign({}, src);
-  }
+
+// hides or shows the pinboard menu
 function togglePinboardMenu() {
+
+    // check if already visible (if height > 0 its visbile)
     if (document.getElementById('pinboardselectmenu').style.height == "60px"){
+        
         document.getElementById('pinboardselectmenu').style.transition = "0.1s";
         document.getElementById('pinboardselectmenu').style.height = "0";
+        // chang arrow to point down since were collapsing
         document.getElementById('pinboardtab').innerHTML = "▼";
+        //hide all elements in the pinboard select menu
         document.getElementById('pinboardtab').style.marginTop = "0px";
         document.getElementById('pinboardselect').style.display = "none";
         document.getElementById('pinboardlabel').style.display = "none";
@@ -37,6 +39,7 @@ function togglePinboardMenu() {
 
         
     }
+    //does the opposite of the above
     else{
         document.getElementById('pinboardselectmenu').style.transition = "0.1s";
         document.getElementById('pinboardselectmenu').style.height = "60px";
@@ -49,7 +52,7 @@ function togglePinboardMenu() {
     }
 
 }
-
+//force hide pinboard menu
 function hidePinboardMenu() {
     document.getElementById('pinboardselectmenu').style.transition = "0.1s";
     document.getElementById('pinboardselectmenu').style.height = "0";
@@ -57,21 +60,27 @@ function hidePinboardMenu() {
     document.getElementById('pinboardtab').style.marginTop = "0px";
     document.getElementById('pinboardselect').style.display = "none";
     document.getElementById('pinboardlabel').style.display = "none";
+    document.getElementById('pinboardadd').style.display = 'none';
 }
 
+// returns the users JSON authorization token - loaded into local storage initially on login page
 function getJWT(){
     return localStorage.token;
 }
+
+// returns username of currently signed in user (email)
 function getUsername(){
     return localStorage.username;
 }
 
 
-// used to initially load the pinboard dropdown list options
+// used to initially load the pinboard dropdown list options (select menu)
 function loadPinboardsList(){
+    //clears whatever is in dropdown currently
   document.getElementById("pinboardselect").innerHTML = "";
   var str = "";
   var obj = {"userID": getUsername()};
+  //ajax API call to get pinboard names and IDs
         $.ajax({
             type: "POST",
             contentType:'application/json',
@@ -82,6 +91,7 @@ function loadPinboardsList(){
             data: JSON.stringify(obj),
             cache: false,
             success: function(data){
+                // load options into select menu
                 var objArray = data["recordset"];
                 for (var i=0;i<objArray.length;i++)
                 {
@@ -95,7 +105,7 @@ function loadPinboardsList(){
                 document.getElementById("pinboardselect").innerHTML = str; 
              },
             error: function(data){
-              alert("failed");
+              //("failed");
             }
           });
         
@@ -103,9 +113,15 @@ function loadPinboardsList(){
 
 // load all lists in currently selected pinboard
 function loadPinboard(){
+    $('#mainarea').innerHTML = "";
     var SelectedPinboard = $('#pinboardselect').find(":selected").val(); // must load the ID as the value, the NAME as the dropdown items text.
 
-    var obj = {"pinboardID": SelectedPinboard};
+    if (SelectedPinboard === '0'){
+        var obj = {"pinboardID": "1000"};
+    }
+    else{
+        var obj = {"pinboardID": SelectedPinboard};
+    }
     $.ajax({
         type: "POST",
         contentType:'application/json',
@@ -153,6 +169,7 @@ function loadPinboard(){
                         Numbered: <input onchange="makeEnumerable(this.getAttribute('data-listID'))" id="listitemID"style="opacity:100;z-index:100" type="checkbox" data-listID="`+listrow["ListID"]+`"></label></span></div><ul style="margin-top:50px;">`;
                     }
             }
+            // used to distinguish list items between the lists they belong to, SQL data set is all list items across all lists -- faster loading than individual ajax call for each list,but more complex code 
             else if(listrow["ListID"] != lastlistID){
                 
                 htmlstring +=`</div><div class="list" id="`+ (listrow["ListID"] + i.toString() )+ `">
@@ -161,7 +178,8 @@ function loadPinboard(){
                 <label data-listID="`+listrow["ListID"]+`" onclick="deleteList(this.getAttribute('data-listID'))" class="Deletebtn">X</label>
                 <div id="listoptionmenu`+listrow["ListID"]+`" class="listoptionmenu">
                 <span class="listoption">`;
-
+                    
+                // check if list is checkable to know if we should render checklist or not
                  if(listrow["isCheckable"]){
                     htmlstring += `Checklist: <input onchange="makeCheckable(this.getAttribute('data-listID'))" style="opacity:100;z-index:100" type="checkbox" data-listID="`+listrow["ListID"]+`" checked></label></span>
                     &nbsp;&nbsp;`;
@@ -171,7 +189,7 @@ function loadPinboard(){
                  &nbsp;&nbsp;`;
 
                 }
-                
+                // check to see if list is numbered
                 if(listrow["isNumbered"]){
                     isNumbered = true;
                     htmlstring += `<span  class="listoption">
@@ -223,7 +241,7 @@ function loadPinboard(){
           ////////////////////////////////////////////
         },
         error: function(data){
-          alert("failed");
+          //alert("failed");
         }
       });
 }
@@ -235,11 +253,14 @@ function logout(){
     window.location.href = '/index.html'
 }
 
+//changing the dropdown menu
 function onPinChange(){
+    $('#mainarea').innerHTML = "";
     loadPinboard();
     hidePinboardMenu();
     document.getElementById('pinboardadd').style.display = 'none';
 }
+
 
 function toggleOptionsMenu(listID){
     if(document.getElementById(listID).style.visibility == "hidden")
@@ -249,6 +270,7 @@ function toggleOptionsMenu(listID){
     }
 }
 
+// brings the add list menu up
 function toggleAddList(){
     var htmlstring =  `<div class="boxx">
     <label onclick="loadPinboard()" style="margin-left:-260px;font-size:16px;color:red;">X</label>
@@ -259,12 +281,14 @@ function toggleAddList(){
     </form>
     <button onclick="addRowListCreate()" class="add-icon" ><i class="material-icons">add_circle_outline</i></button>
     <p onclick='addList()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Create</p>
+    <p onclick='loadPinboard()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Cancel</p>
  </div>`;
  document.getElementById('mainarea').innerHTML = htmlstring;
  document.getElementById('pinboardadd').style.display = 'none';
  hidePinboardMenu();
  }
 
+ // actually inserts the list into the DB
  function addList(){
     var currentPinboard = $('#pinboardselect').find(":selected").val();
     var listItems = document.getElementById('createListForm').children;
@@ -286,19 +310,20 @@ function toggleAddList(){
            
          },
         error: function(data){
-          alert("failed");
+          //alert("failed");
         }
       });
       $('#mainarea').innerHTML = "";
-      loadPinboard();
       document.getElementById('mainarea').style.display = 'none';
       document.getElementById('mainarea').style.display = 'flex';
+      loadPinboard();
 
  }
 
+ // insert pinboard into DB
  function addPinboard() {
      var currentUser = getUsername();
-     var listItems = document.getElementById('createListForm').children;
+     var listItems = document.getElementById('createPinForm').children;
      var ListArray = [];
      for (i=0;i<listItems.length;i++){
          ListArray.push(listItems[i].value);
@@ -317,34 +342,39 @@ function toggleAddList(){
            
          },
         error: function(data){
-          alert("failed");
+         // alert("failed");
         }
       });
       $('#mainarea').innerHTML = "";
       loadPinboard();
       document.getElementById('mainarea').style.display = 'none';
         document.getElementById('mainarea').style.display = 'flex';
+        loadPinboardsList();
  }
+
+ //show add pinboard menu
 function toggleAddPin(){
    var htmlstring =  `<div class="boxx">
-   <label onclick="loadPinboard()" style="margin-left:-260px;font-size:16px;color:red;">X</label>
-   <h3 class="teal-text text-darken-2">Create new list</h3>
-   <form id="createListForm" class="flex-column">
+   <h3 class="teal-text text-darken-2">Create New Pinboard</h3>
+   <form id="createPinForm" class="flex-column">
          <input  type="text" class="validate" placeholder="Pinboard Title">
    </form>
-   <p onclick='loadPinboard()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Create</p>
+   <p onclick='addPinboard()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Create</p>
+   <p onclick='loadPinboard()'class="button" style="width:60px;background-color:#13524B;color:white;padding:5px;border-radius:5%;">Cancel</p>
 </div>`;
 document.getElementById('mainarea').innerHTML = htmlstring;
 document.getElementById('pinboardadd').style.display = 'none';
 hidePinboardMenu();
 }
 
+// add row during list creation
 function addRowListCreate(){
     var newInput = document.createElement('input');
     newInput.innerHTML = `<input  type="text" class="validate" placeholder="List Item">`;
     document.getElementById('createListForm').appendChild(newInput);
 }
 
+// makes list checkable
 function makeCheckable(listID){
 
     $.ajax({
@@ -361,7 +391,7 @@ function makeCheckable(listID){
       
          },
         error: function(data){
-          alert("failed");
+        //  alert("failed");
         }
       });
   $('#mainarea').innerHTML = "";
@@ -370,6 +400,7 @@ function makeCheckable(listID){
   document.getElementById('mainarea').style.display = 'flex';
 }
 
+// makes list numbered or not
 function makeEnumerable(listID){
     $.ajax({
         type: "POST",
@@ -385,7 +416,7 @@ function makeEnumerable(listID){
       
          },
         error: function(data){
-          alert("failed");
+        //  alert("failed");
         }
       });
   $('#mainarea').innerHTML = "";
@@ -409,7 +440,31 @@ function deleteList(listID){
       
          },
         error: function(data){
-          alert("failed");
+         // alert("failed");
+        }
+      });
+  $('#mainarea').innerHTML = "";
+  loadPinboard();
+  document.getElementById('mainarea').style.display = 'none';
+  document.getElementById('mainarea').style.display = 'flex';
+}
+
+//complete list item (checkbox event)
+function completeItem(listItemID){
+    $.ajax({
+        type: "POST",
+        contentType:'application/json',
+        beforeSend: function(request) {
+            request.setRequestHeader("x-access-token", getJWT());
+          },
+        url: "http://listed.ddns.net:8080/markComplete",
+        data: JSON.stringify({"listItemID":listItemID}),
+        cache: false,
+        success: function(data){
+      
+         },
+        error: function(data){
+          //alert("failed");
         }
       });
   $('#mainarea').innerHTML = "";
