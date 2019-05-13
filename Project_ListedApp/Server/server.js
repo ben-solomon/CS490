@@ -253,7 +253,7 @@ app.post("/makeCheckable", function(req , res){
 app.post("/makeEnumerable", function(req , res){
    var listID = req.body.listID;
   
-   var query = "UPDATE User_Lists set isCheckable=(SELECT ~isNumbered from User_Lists Where ID=@LISTID) where ID=@LISTID";
+   var query = "UPDATE User_Lists set isNumbered=(SELECT ~isNumbered from User_Lists Where ID=@LISTID) where ID=@LISTID";
    var parameters = [
    {name: "LISTID", sqltype: sql.VarChar, value: listID}];
    var request = new sql.Request();
@@ -288,6 +288,21 @@ app.post("/addPinboard", function(req , res){
    var parameters = [
    {name: "USERID", sqltype: sql.VarChar, value: userID},
     {name: "TITLE", sqltype: sql.VarChar, value: title}];
+   var request = new sql.Request();
+   for (j=0;j<parameters.length;j++)
+   {
+    request.input(parameters[j].name,parameters[j].sqltype,parameters[j].value);                               
+   }
+   request.query(query);	
+   
+});
+
+app.post("/markComplete", function(req , res){
+   var ListItemID = req.body.listItemID;
+  
+   var query = "Update User_Lists_Items set isComplete = (SELECT ~isComplete from User_Lists_Items where ID =@LISTITEMID) where ID = @LISTITEMID";
+   var parameters = [
+   {name: "LISTITEMID", sqltype: sql.VarChar, value: ListItemID}];
    var request = new sql.Request();
    for (j=0;j<parameters.length;j++)
    {
